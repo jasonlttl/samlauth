@@ -13,8 +13,6 @@ use Drupal\samlauth\Event\SamlauthUserSyncEvent;
 use Drupal\user\PrivateTempStoreFactory;
 use Drupal\user\UserInterface;
 use Exception;
-use OneLogin_Saml2_Auth;
-use OneLogin_Saml2_Error;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,9 +23,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class SamlService {
 
   /**
-   * A OneLogin_Saml2_Auth object representing the current request state.
+   * A OneLogin\Saml2\Auth object representing the current request state.
    *
-   * @var \OneLogin_Saml2_Auth
+   * @var \OneLogin\Saml2\Auth
    */
   protected $samlAuth;
 
@@ -102,7 +100,7 @@ class SamlService {
    * Show metadata about the local sp. Use this to configure your saml2 IDP
    *
    * @return mixed xml string representing metadata
-   * @throws OneLogin_Saml2_Error
+   * @throws \OneLogin\Saml2\Error
    */
   public function getMetadata() {
     $settings = $this->getSamlAuth()->getSettings();
@@ -113,7 +111,7 @@ class SamlService {
       return $metadata;
     }
     else {
-      throw new OneLogin_Saml2_Error('Invalid SP metadata: ' . implode(', ', $errors), OneLogin_Saml2_Error::METADATA_SP_INVALID);
+      throw new \OneLogin\Saml2\Error('Invalid SP metadata: ' . implode(', ', $errors), \OneLogin\Saml2\Error::METADATA_SP_INVALID);
     }
   }
 
@@ -165,7 +163,7 @@ class SamlService {
    */
   public function acs() {
     // This call can either set an error condition or throw a
-    // \OneLogin_Saml2_Error exception, depending on whether or not we are
+    // \OneLogin\Saml2\Error exception, depending on whether or not we are
     // processing a POST request. Don't catch the exception.
     $this->getSamlAuth()->processResponse();
     // Now look if there were any errors and also throw.
@@ -286,7 +284,7 @@ class SamlService {
    */
   public function sls() {
     // This call can either set an error condition or throw a
-    // \OneLogin_Saml2_Error exception, depending on whether or not we are
+    // \OneLogin\Saml2\Error exception, depending on whether or not we are
     // processing a POST request. Don't catch the exception.
     $url = $this->getSamlAuth()->processSLO(FALSE, NULL, FALSE, NULL, TRUE);
     // Now look if there were any errors and also throw.
@@ -378,7 +376,7 @@ class SamlService {
    */
   protected function getSamlAuth() {
     if (!isset($this->samlAuth)) {
-      $this->samlAuth = new OneLogin_Saml2_Auth(static::reformatConfig($this->config));
+      $this->samlAuth = new \OneLogin\Saml2\Auth(static::reformatConfig($this->config));
     }
 
     return $this->samlAuth;
